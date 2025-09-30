@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Welcome to Bedroom Bliss Empire - Ignite Your Passion!">
+<meta name="theme-color" content="#1e1b4b">
+<link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedroom Bliss Preferences</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #5b21b6, #d946ef);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        .header {
+            text-align: center;
+            margin-top: 2rem;
+            color: #ff4444;
+            text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733;
+            animation: pulseGlow 2s infinite;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .header h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px #ff4444, 0 0 40px #ff7733; }
+            100% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+        }
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        .preference-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .preference-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        .preference-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ff4444;
+        }
+        .preference-card label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .preference-card input[type="range"],
+        .preference-card input[type="number"],
+        .preference-card select {
+            width: 100%;
+            margin-bottom: 1rem;
+           margin-right: 1rem;
+            accent-color: #ff4444;
+            color: black;
+            font-family:'poppins' sans-serif ;
+        }
+        .preference-card input[type="checkbox"] {
+            margin-right: 0.5rem;
+            transform: scale(1.2);
+        }
+        .preference-card button {
+            background: linear-gradient(to right, #e11d48, #0ea5e9);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .preference-card button:hover {
+            background: linear-gradient(to right, #0ea5e9, #e11d48);
+            transform: scale(1.1);
+        }
+        .back-button {
+            background: linear-gradient(to right, #e11d48, #0ea5e9);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background: linear-gradient(to right, #0ea5e9, #e11d48);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        @media (max-width: 640px) {
+            .header h1 { font-size: 2.5rem; }
+            .header h2 { font-size: 1.3rem; }
+            .preferences-grid { grid-template-columns: 1fr; padding: 1rem; }
+            .preference-card { padding: 1.5rem; }
+            .preference-card h3 { font-size: 1.2rem; }
+            .preference-card label { font-size: 0.9rem; }
+            .preference-card button { font-size: 0.9rem; padding: 0.6rem 1.2rem; }
+            .back-button { font-size: 1rem; padding: 0.8rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bedroom Bliss</h1>
+        <h2>Tailor Your Temptation</h2>
+    </div>
+    <div class="preferences-grid">
+        <div class="preference-card">
+            <h3>Timer Range</h3>
+            <label>Min Time (mins): <input type="number" id="minTime" min="1" max="20" value="3" onchange="updatePref('minTime', this.value)"></label>
+            <label>Max Time (mins): <input type="number" id="maxTime" min="1" max="20" value="15" onchange="updatePref('maxTime', this.value)"></label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+        <div class="preference-card">
+            <h3>Sound Volume</h3>
+            <label>Scratch & Timer Volume: <input type="range" id="soundVolume" min="0" max="1" step="0.1" value="0.7" onchange="updatePref('soundVolume', this.value)"></label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+        <div class="preference-card">
+            <h3>Badge Display</h3>
+            <label><input type="checkbox" id="showBadges" onchange="updatePref('showBadges', this.checked)"> Show Achievements</label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+        <div class="preference-card">
+            <h3>Theme Selection</h3>
+            <label>Choose Theme: <select id="theme" onchange="updatePref('theme', this.value)">
+                <option value="passion">Passion (Red)</option>
+                <option value="mystic">Mystic (Purple)</option>
+                <option value="golden">Golden (Gold)</option>
+            </select></label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+        <div class="preference-card">
+            <h3>Tip Visibility</h3>
+            <label><input type="checkbox" id="showTips" onchange="updatePref('showTips', this.checked)"> Show Position Tips</label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+        <div class="preference-card">
+            <h3>Scratch Sensitivity</h3>
+            <label>Brush Size: <select id="scratchSensitivity" onchange="updatePref('scratchSensitivity', this.value)">
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select></label>
+            <button onclick="savePreferences()">Save Settings</button>
+        </div>
+    </div>
+    <a href="index.html" class="back-button">Back to Empire</a>
+
+    <script>
+        // Load saved preferences or set defaults
+        let prefs = JSON.parse(localStorage.getItem('preferences')) || {
+            minTime: 3,
+            maxTime: 15,
+            soundVolume: 0.7,
+            showBadges: true,
+            theme: 'passion',
+            showTips: true,
+            scratchSensitivity: 'medium'
+        };
+
+        // Initialize input values
+        document.getElementById('minTime').value = prefs.minTime;
+        document.getElementById('maxTime').value = prefs.maxTime;
+        document.getElementById('soundVolume').value = prefs.soundVolume;
+        document.getElementById('showBadges').checked = prefs.showBadges;
+        document.getElementById('theme').value = prefs.theme;
+        document.getElementById('showTips').checked = prefs.showTips;
+        document.getElementById('scratchSensitivity').value = prefs.scratchSensitivity;
+
+        function updatePref(key, value) {
+            switch (key) {
+                case 'minTime':
+                case 'maxTime':
+                    prefs[key] = parseInt(value);
+                    break;
+                case 'soundVolume':
+                    prefs[key] = parseFloat(value);
+                    break;
+                case 'showBadges':
+                case 'showTips':
+                    prefs[key] = !!value;
+                    break;
+                case 'theme':
+                case 'scratchSensitivity':
+                    prefs[key] = value;
+                    break;
+            }
+            // Preview theme change
+            if (key === 'theme') applyTheme(value);
+            console.log(`Updated ${key} to ${value}`); // For debugging
+        }
+
+        function savePreferences() {
+            if (prefs.minTime >= prefs.maxTime) {
+                alert("Min time must be less than Max time!");
+                return;
+            }
+            if (prefs.soundVolume < 0 || prefs.soundVolume > 1) {
+                alert("Sound volume must be between 0 and 1!");
+                return;
+            }
+            localStorage.setItem('preferences', JSON.stringify(prefs));
+            alert("Preferences saved! Restart the game to apply changes.");
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            switch (theme) {
+                case 'passion':
+                    body.style.background = 'linear-gradient(135deg, #1e1b4b, #5b21b6, #d946ef)';
+                    break;
+                case 'mystic':
+                    body.style.background = 'linear-gradient(135deg, #2d1b4e, #6b21a8, #a855f7)';
+                    break;
+                case 'golden':
+                    body.style.background = 'linear-gradient(135deg, #4a2c0e, #a16207, #f59e0b)';
+                    break;
+            }
+        }
+
+        // Apply initial theme
+        applyTheme(prefs.theme);
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.error('Service Worker registration failed:', err));
+    }
+</script>
+</body>
+</html>

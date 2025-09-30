@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Welcome to Bedroom Bliss Empire - Ignite Your Passion!">
+<meta name="theme-color" content="#1e1b4b">
+<link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedroom Bliss Stats</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #5b21b6, #d946ef);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        .header {
+            text-align: center;
+            margin-top: 2rem;
+            color: #ff4444;
+            text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733;
+            animation: pulseGlow 2s infinite;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .header h2 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px #ff4444, 0 0 40px #ff7733; }
+            100% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        .stat-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ff4444;
+        }
+        .stat-card p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin: 0 auto;
+            max-width: 90%;
+        }
+        .stat-card li {
+            font-size: 1rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .back-button {
+            background: linear-gradient(to right, #e11d48, #0ea5e9);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 1rem;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background: linear-gradient(to right, #0ea5e9, #e11d48);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        @media (max-width: 640px) {
+            .header h1 { font-size: 2.5rem; }
+            .header h2 { font-size: 1.3rem; }
+            .stats-grid { grid-template-columns: 1fr; padding: 1rem; }
+            .stat-card { padding: 1.5rem; }
+            .stat-card h3 { font-size: 1.2rem; }
+            .stat-card p { font-size: 1rem; }
+            .stat-card li { font-size: 0.9rem; }
+            .back-button { font-size: 1rem; padding: 0.8rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bedroom Bliss</h1>
+        <h2>Your Conquest Stats</h2>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Play Time</h3>
+            <p id="total-play-time">Loading...</p>
+        </div>
+        <div class="stat-card">
+            <h3>Achievements Earned</h3>
+            <ul id="achievements-list"></ul>
+        </div>
+        <div class="stat-card">
+            <h3>Quick Reveals</h3>
+            <p id="quick-reveals">Loading...</p>
+        </div>
+        <div class="stat-card">
+            <h3>Positions Unlocked</h3>
+            <p id="positions-count">Loading...</p>
+            <ul id="positions-list"></ul>
+        </div>
+    </div>
+    <a href="index.html" class="back-button">Back to Empire</a>
+
+    <script>
+        // Load game state and badges from localStorage
+        const gameState = JSON.parse(localStorage.getItem('gameState')) || {
+            totalPlayTime: 0,
+            quickRevealCount: 0,
+            revealedPositions: []
+        };
+        const badges = JSON.parse(localStorage.getItem('badges')) || {};
+
+        // Update stats
+        function updateStats() {
+            const totalPlayTimeElement = document.getElementById('total-play-time');
+            const achievementsList = document.getElementById('achievements-list');
+            const quickRevealsElement = document.getElementById('quick-reveals');
+            const positionsCountElement = document.getElementById('positions-count');
+            const positionsList = document.getElementById('positions-list');
+
+            // Total Play Time
+            const hours = Math.floor(gameState.totalPlayTime / 3600);
+            const minutes = Math.floor((gameState.totalPlayTime % 3600) / 60);
+            const seconds = gameState.totalPlayTime % 60;
+            totalPlayTimeElement.textContent = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+
+            // Achievements Earned
+            achievementsList.innerHTML = '';
+            Object.keys(badges).forEach(badge => {
+                if (badges[badge]) {
+                    const li = document.createElement('li');
+                    li.textContent = badge;
+                    achievementsList.appendChild(li);
+                }
+            });
+            if (!achievementsList.children.length) {
+                achievementsList.innerHTML = '<li>No achievements yet!</li>';
+            }
+
+            // Quick Reveals
+            quickRevealsElement.textContent = `${gameState.quickRevealCount} reveals under 10s`;
+
+            // Positions Unlocked
+            const positions = gameState.revealedPositions || [];
+            positionsCountElement.textContent = `${positions.length} out of 17`;
+            positionsList.innerHTML = '';
+            positions.forEach(position => {
+                const li = document.createElement('li');
+                li.textContent = position;
+                positionsList.appendChild(li);
+            });
+            if (!positionsList.children.length) {
+                positionsList.innerHTML = '<li>No positions unlocked yet!</li>';
+            }
+        }
+
+        // Apply theme from preferences
+        const prefs = JSON.parse(localStorage.getItem('preferences')) || { theme: 'passion' };
+        function applyTheme(theme) {
+            const body = document.body;
+            switch (theme) {
+                case 'passion':
+                    body.style.background = 'linear-gradient(135deg, #1e1b4b, #5b21b6, #d946ef)';
+                    break;
+                case 'mystic':
+                    body.style.background = 'linear-gradient(135deg, #2d1b4e, #6b21a8, #a855f7)';
+                    break;
+                case 'golden':
+                    body.style.background = 'linear-gradient(135deg, #4a2c0e, #a16207, #f59e0b)';
+                    break;
+            }
+        }
+        applyTheme(prefs.theme);
+
+        // Initial update
+        updateStats();
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.error('Service Worker registration failed:', err));
+    }
+</script>
+</body>
+</html>
