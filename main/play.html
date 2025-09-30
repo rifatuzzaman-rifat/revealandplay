@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Scratch & Reveal</title>
+    <!-- Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-y: auto;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #5b21b6);
+        }
+        .scratch-container {
+            position: relative;
+            width: 100vw;
+            height: 100vw;
+            max-width: 100%;
+            max-height: calc(100vh - 260px);
+            margin: 0 auto;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        .reveal-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .reveal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            border-radius: 20px;
+        }
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: pointer;
+        }
+        #progress-bar {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #progress-fill {
+            background: linear-gradient(to right, #db2777, #2563eb);
+            transition: width 0.3s ease;
+        }
+        #reset-button, #next-button {
+            background: linear-gradient(to right, #e11d48, #0ea5e9);
+            transition: all 0.3s ease;
+        }
+        #reset-button:hover, #next-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #0ea5e9, #e11d48);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+            animation: sparkle 0.5s ease-out forwards;
+        }
+        @keyframes sparkle {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        #image-name {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #image-name.show {
+            opacity: 1;
+        }
+        #timer, #total-time {
+            color: #ff4444;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff4444;
+            margin: 5px 0;
+        }
+        #timer-bar {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #timer-fill {
+            background: linear-gradient(to right, #ff4444, #ff7733);
+            transition: width 1s linear;
+        }
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            transform: scale(0);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .badge.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        #tip {
+            color: #fff;
+            font-size: 16px;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-align: center;
+        }
+        #tip.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mt-6 mb-2 tracking-tight animate-pulse">
+        Reveal your fantasies!!!
+    </h1>
+    <div id="image-name" class="text-white text-xl font-medium mb-2"></div>
+    <div id="timer" class="text-white text-2xl font-medium mb-2"></div>
+    <div id="timer-bar" class="w-11/12 max-w-lg h-2 rounded-full overflow-hidden mb-2">
+        <div id="timer-fill" class="h-full rounded-full"></div>
+    </div>
+    <div id="total-time" class="text-white text-xl font-medium mb-2">Total Time: 0h 00m 00s</div>
+    <div class="badges"></div>
+    <div id="tip"></div>
+    <div class="scratch-container mx-4">
+        <div class="reveal-content">
+            <img id="reveal-image" src="" alt="Revealed Image">
+        </div>
+        <canvas id="scratch-canvas"></canvas>
+    </div>
+    <div class="flex items-center justify-center w-11/12 max-w-lg mt-4">
+        <span id="progress-text" class="text-white font-medium mr-4">0%</span>
+        <div id="progress-bar" class="w-full h-5 rounded-full overflow-hidden">
+            <div id="progress-fill" class="h-full rounded-full"></div>
+        </div>
+    </div>
+    <button id="reset-button" class="mt-4 px-8 py-3 text-white font-semibold rounded-lg shadow-lg animate-pulse">
+        Reset
+    </button>
+    <button id="next-button" class="mt-4 px-8 py-3 text-white font-semibold rounded-lg shadow-lg animate-pulse hidden">
+        Next Position
+    </button>
+    <audio id="scratch-sound" src="sound.mp3" loop></audio>
+    <audio id="timer-sound" src="timer-end.mp3" preload="auto"></audio>
+
+
+
+
+<script>
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.querySelector('.scratch-container');
+    const revealContent = document.querySelector('.reveal-content');
+    const revealImage = document.getElementById('reveal-image');
+    const imageName = document.getElementById('image-name');
+    const timerDisplay = document.getElementById('timer');
+    const timerFill = document.getElementById('timer-fill');
+    const totalTimeDisplay = document.getElementById('total-time');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const resetButton = document.getElementById('reset-button');
+    const nextButton = document.getElementById('next-button');
+    const scratchSound = document.getElementById('scratch-sound');
+    const timerSound = document.getElementById('timer-sound');
+    const badgesContainer = document.querySelector('.badges');
+    const tipElement = document.getElementById('tip');
+
+    const imageFiles = [
+        'images/69.jpg',
+        'images/Anal sex.jpg',
+        'images/Blowjob.jpg',
+        'images/Cowgirl.jpg',
+        'images/cum in boobs.png',
+        'images/deep missionary.jpg',
+        'images/Doggy style.jpg',
+        'images/french kiss.jpg',
+        'images/Lotus.jpg',
+        'images/Missionary.jpg',
+        'images/nipple sucking.jpg',
+        'images/Piledriver.jpg',
+        'images/Pussy fingering.jpg',
+        'images/spoons.jpg',
+        'images/Standing sex.jpg',
+        'images/Sucking pussy.jpg',
+        'images/T-square.jpg'
+    ];
+
+    const positionTips = {
+        '69': 'Get wild with a mirrored tease—drive each other crazy!',
+        'Anal sex': 'Dive in slow, tease with lube, and ignite the passion!',
+        'Blowjob': 'Lock eyes and suck with fierce desire—pure fire!',
+        'Cowgirl': 'Let her ride hard and take total control—feel the rush!',
+        'cum in boobs': 'Build the tension, then explode with reckless abandon!',
+        'deep missionary': 'Lift her hips high and thrust deep—unleash the beast!',
+        'Doggy style': 'Pound with a pillow boost—raw and relentless!',
+        'french kiss': 'Tongue wrestle like it’s a battle for dominance!',
+        'Lotus': 'Clutch tight and grind slow—intense love overload!',
+        'Missionary': 'Hike those legs and plunge in—pure ecstasy awaits!',
+        'nipple sucking': 'Nibble hard and suck deep—send shivers down the spine!',
+        'Piledriver': 'Power through with strength—dominate the moment!',
+        'Pussy fingering': 'Tease slow, then plunge fast—make her beg for more!',
+        'spoons': 'Spoon tight and thrust sneaky—morning heat explosion!',
+        'Standing sex': 'Pin her against the wall and go wild—unstoppable force!',
+        'Sucking pussy': 'Lick with rhythm, suck with hunger—taste the frenzy!',
+        'T-square': 'Angle it sharp and thrust hard—mind-blowing intensity!'
+    };
+
+    let timerInterval = null;
+    let totalPlayTime = 0;
+    let lastImageIndex = -1;
+    let startRevealTime = null;
+    let quickRevealCount = 0;
+    let revealedPositions = new Set();
+    let badges = JSON.parse(localStorage.getItem('badges')) || {};
+
+    // Load preferences from localStorage or set defaults
+    let prefs = JSON.parse(localStorage.getItem('preferences')) || {
+        minTime: 3,
+        maxTime: 15,
+        soundVolume: 0.7,
+        showBadges: true,
+        theme: 'passion',
+        showTips: true,
+        scratchSensitivity: 'medium'
+    };
+
+    const savedState = JSON.parse(localStorage.getItem('gameState'));
+    if (savedState) {
+        totalPlayTime = savedState.totalPlayTime || 0;
+        lastImageIndex = savedState.lastImageIndex || -1;
+        quickRevealCount = savedState.quickRevealCount || 0;
+        revealedPositions = new Set(savedState.revealedPositions || []);
+        updateTotalTimeDisplay();
+        setRandomImage();
+    } else {
+        setRandomImage();
+    }
+
+    // Apply theme
+    applyTheme(prefs.theme);
+
+    // Apply sound volume
+    scratchSound.volume = timerSound.volume = prefs.soundVolume;
+
+    // Set brush size based on sensitivity
+    let brushSize;
+    switch (prefs.scratchSensitivity) {
+        case 'small': brushSize = 40; break;
+        case 'medium': brushSize = 80; break;
+        case 'large': brushSize = 160; break;
+    }
+
+    function applyTheme(theme) {
+        const body = document.body;
+        switch (theme) {
+            case 'passion':
+                body.style.background = 'linear-gradient(135deg, #1e1b4b, #5b21b6)';
+                break;
+            case 'mystic':
+                body.style.background = 'linear-gradient(135deg, #2d1b4e, #6b21a8)';
+                break;
+            case 'golden':
+                body.style.background = 'linear-gradient(135deg, #4a2c0e, #a16207)';
+                break;
+        }
+    }
+
+    function setRandomImage() {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * imageFiles.length);
+        } while (randomIndex === lastImageIndex);
+        lastImageIndex = randomIndex;
+        const selectedImage = imageFiles[randomIndex];
+        revealImage.src = selectedImage;
+        const fileName = selectedImage.split('/').pop().split('.').slice(0, -1).join('.');
+        imageName.textContent = fileName;
+        imageName.classList.remove('show');
+    }
+
+    function resizeCanvas() {
+        const size = Math.min(window.innerWidth, window.innerHeight - 260);
+        canvas.width = size;
+        canvas.height = size;
+        container.style.width = `${size}px`;
+        container.style.height = `${size}px`;
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#eab308');
+        gradient.addColorStop(0.5, '#ef4444');
+        gradient.addColorStop(1, '#8b5cf6');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let isDrawing = false;
+    let scratchedPixels = 0;
+    let totalPixels = canvas.width * canvas.height;
+
+    function getPosition(e) {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches) {
+            return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        } else {
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+    }
+
+    function addSparkle(x, y) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = `${x}px`;
+        sparkle.style.top = `${y}px`;
+        container.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 500);
+    }
+
+    function startDrawing(e) {
+        isDrawing = true;
+        if (!startRevealTime) startRevealTime = Date.now();
+        scratchSound.play().catch(err => console.log('Audio play failed:', err));
+        draw(e);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+
+        const pos = getPosition(e);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = 'round';
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+
+        if (Math.random() < 0.2) addSparkle(pos.x, pos.y);
+
+        const sampleSize = Math.min(canvas.width, canvas.height) / 1;
+        const imageData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+        scratchedPixels = 0;
+        for (let i = 3; i < imageData.data.length; i += 4) {
+            if (imageData.data[i] < 10) scratchedPixels++;
+        }
+        const progress = (scratchedPixels / (sampleSize * sampleSize)) * 100;
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `${Math.round(progress)}%`;
+
+        if (progress > 75) {
+            fullyReveal();
+        }
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+        scratchSound.pause();
+        scratchSound.currentTime = 0;
+    }
+
+    function fullyReveal() {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        revealContent.style.opacity = '1';
+        progressFill.style.width = '100%';
+        progressText.textContent = '100%';
+        imageName.classList.add('show');
+        scratchSound.pause();
+        scratchSound.currentTime = 0;
+        confetti({ particleCount: 10, spread: 100, origin: { y: 0.6 } });
+
+        const fileName = imageName.textContent;
+        if (prefs.showTips) {
+            tipElement.textContent = positionTips[fileName] || 'Enjoy the moment!';
+            tipElement.classList.add('show');
+        } else {
+            tipElement.classList.remove('show');
+        }
+
+        const revealTime = (Date.now() - startRevealTime) / 1000;
+        startRevealTime = null;
+        checkAchievements(revealTime, fileName);
+
+        startPlayTimer();
+        canvas.style.pointerEvents = 'none';
+        nextButton.classList.remove('hidden');
+    }
+
+    function startPlayTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        const minDuration = prefs.minTime * 60;
+        const maxDuration = prefs.maxTime * 60;
+        const duration = Math.floor(Math.random() * (maxDuration - minDuration + 1)) + minDuration;
+        let timeLeft = duration;
+        timerFill.style.width = '100%';
+        timerDisplay.textContent = `Play Time: ${String(Math.floor(timeLeft / 60)).padStart(2, '0')}m ${String(timeLeft % 60).padStart(2, '0')}s`;
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            totalPlayTime++;
+            const hours = Math.floor(totalPlayTime / 3600);
+            const minutes = Math.floor((totalPlayTime % 3600) / 60);
+            const seconds = totalPlayTime % 60;
+            totalTimeDisplay.textContent = `Total Time: ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+            timerDisplay.textContent = `Play Time: ${String(Math.floor(timeLeft / 60)).padStart(2, '0')}m ${String(timeLeft % 60).padStart(2, '0')}s`;
+            timerFill.style.width = `${(timeLeft / duration) * 100}%`;
+
+            if (timeLeft <= 2 && timeLeft > 0 && timerSound.paused) {
+                timerSound.currentTime = 0;
+                timerSound.play().catch(err => console.log('Timer sound play failed:', err));
+            }
+
+            if (timeLeft <= 0) {
+                const fileName = imageName.textContent;
+                const logEntry = {
+    date: new Date().toISOString().split('T')[0],
+    position: fileName,
+    duration: duration,
+    picture: revealImage.src
+};
+                gameState.log.push(logEntry);
+            saveProgress();
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timerSound.pause();
+                timerSound.currentTime = 0;
+                timerDisplay.textContent = 'Time’s Up! Scratch Again!';
+                setTimeout(() => {
+                    nextButton.classList.add('hidden');
+                    tipElement.classList.remove('show');
+                    resetForNext();
+                    saveProgress();
+                }, 2000);
+            }
+        }, 1000);
+    }
+
+    function resetForNext() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        resizeCanvas();
+        progressFill.style.width = '0%';
+        progressText.textContent = '0%';
+        revealContent.style.opacity = '1';
+        imageName.classList.remove('show');
+        scratchedPixels = 0;
+        document.querySelectorAll('.sparkle').forEach(s => s.remove());
+        timerDisplay.textContent = '';
+        timerFill.style.width = '100%';
+        canvas.style.pointerEvents = 'auto';
+        nextButton.classList.add('hidden');
+        if (!prefs.showTips) tipElement.classList.remove('show');
+        setRandomImage();
+        saveProgress();
+    }
+
+    function checkAchievements(revealTime, fileName) {
+        // Speed Scratch Master (< 10s)
+        if (revealTime < 10 && !badges['speedMaster']) {
+            badges['speedMaster'] = true;
+            addBadge('Speed Scratch Master');
+        }
+        // Marathon Lovers (> 1h)
+        if (totalPlayTime >= 3600 && !badges['marathonLovers']) {
+            badges['marathonLovers'] = true;
+            addBadge('Marathon Lovers');
+        }
+        // Quick Draw Champion (5 reveals < 10s)
+        if (revealTime < 10) quickRevealCount++;
+        if (quickRevealCount >= 5 && !badges['quickDrawChampion']) {
+            badges['quickDrawChampion'] = true;
+            addBadge('Quick Draw Champion');
+        }
+        // Endurance King/Queen (> 3h)
+        if (totalPlayTime >= 10800 && !badges['enduranceKingQueen']) {
+            badges['enduranceKingQueen'] = true;
+            addBadge('Endurance King/Queen');
+        }
+        // Reveal Master (all 17 positions)
+        revealedPositions.add(fileName);
+        if (revealedPositions.size >= 17 && !badges['revealMaster']) {
+            badges['revealMaster'] = true;
+            addBadge('Reveal Master');
+        }
+        localStorage.setItem('badges', JSON.stringify(badges));
+    }
+
+    function addBadge(name) {
+        if (!prefs.showBadges) return; // Skip if badges are hidden
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = name;
+        badgesContainer.appendChild(badge);
+        setTimeout(() => badge.classList.add('active'), 10);
+    }
+
+    function updateTotalTimeDisplay() {
+        const hours = Math.floor(totalPlayTime / 3600);
+        const minutes = Math.floor((totalPlayTime % 3600) / 60);
+        const seconds = totalPlayTime % 60;
+        totalTimeDisplay.textContent = `Total Time: ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+    }
+
+    function saveProgress() {
+        const gameState = {
+            totalPlayTime,
+            lastImageIndex,
+            quickRevealCount,
+            revealedPositions: Array.from(revealedPositions),
+            date: new Date().toISOString()
+        };
+        localStorage.setItem('gameState', JSON.stringify(gameState));
+    }
+
+    Object.keys(badges).forEach(badge => {
+        if (badges[badge]) addBadge(badge);
+    });
+
+    resetButton.addEventListener('click', () => {
+        resetForNext();
+    });
+
+    nextButton.addEventListener('click', () => {
+        resetForNext();
+    });
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDrawing);
+</script>
+-
+
+
+
+
+
+
+
+
+</body>
+</html>

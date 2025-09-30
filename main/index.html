@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedroom Bliss Empire</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Particle.js CDN -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #5b21b6, #d946ef);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .heading {
+            text-align: center;
+            margin-top: 2rem;
+            color: #ff4444;
+            text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733;
+            animation: pulseGlow 2s infinite;
+        }
+        .heading h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .heading h2 {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px #ff4444, 0 0 40px #ff7733; }
+            100% { transform: scale(1); text-shadow: 0 0 20px #ff4444, 0 0 30px #ff7733; }
+        }
+        .doorway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        .doorway-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .doorway-card a {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+            padding: 1rem;
+            background: linear-gradient(to right, #e11d48, #0ea5e9);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .doorway-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        .doorway-card a:hover {
+            background: linear-gradient(to right, #0ea5e9, #e11d48);
+            transform: scale(1.1);
+        }
+        @media (max-width: 640px) {
+            .heading h1 { font-size: 2.5rem; }
+            .heading h2 { font-size: 1.5rem; }
+            .doorway-grid { grid-template-columns: 1fr; padding: 1rem; }
+            .doorway-card { padding: 1.5rem; }
+            .doorway-card a { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="heading">
+        <h1>Bedroom Bliss</h1>
+        <h2>Unleash Your Wildest Desires</h2>
+    </div>
+    <div class="doorway-grid">
+        <div class="doorway-card"><a href="play.html">Ignite the Game</a></div>
+        <div class="doorway-card"><a href="activities.html">Unleash Activities</a></div>
+        <div class="doorway-card"><a href="preferences.html">Customize Preferences</a></div>
+        <div class="doorway-card"><a href="stats.html">Reveal Your Stats</a></div>
+        <div class="doorway-card"><a href="about.html">Discover About Us</a></div>
+    </div>
+
+    <script>
+        particlesJS({
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ff4444" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: false },
+                move: { enable: true, speed: 2, direction: "none", random: true }
+            },
+            interactivity: {
+                events: { onhover: { enable: true, mode: "repulse" } },
+                modes: { repulse: { distance: 100, duration: 0.4 } }
+            }
+        });
+    </script>
+</body>
+</html>
