@@ -422,22 +422,27 @@
         }
 
         function resetForNext() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = null;
-            resizeCanvas();
-            progressFill.style.width = '0%';
-            progressText.textContent = '0%';
-            revealContent.style.opacity = '1';
-            imageName.classList.remove('show');
-            scratchedPixels = 0;
-            document.querySelectorAll('.sparkle').forEach(s => s.remove());
-            timerDisplay.textContent = '';
-            timerFill.style.width = '100%';
-            canvas.style.pointerEvents = 'auto';
-            nextButton.classList.add('hidden');
-            tipElement.classList.remove('show');
-            setRandomImage();
-            saveProgress();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    resizeCanvas();
+    progressFill.style.width = '0%';
+    progressText.textContent = '0%';
+
+    // ❌ wrong
+    // revealContent.style.opacity = '1';
+    // ✅ correct
+    revealContent.style.opacity = '0';
+
+    imageName.classList.remove('show');
+    scratchedPixels = 0;
+    document.querySelectorAll('.sparkle').forEach(s => s.remove());
+    timerDisplay.textContent = '';
+    timerFill.style.width = '100%';
+    canvas.style.pointerEvents = 'auto';
+    nextButton.classList.add('hidden');
+    tipElement.classList.remove('show');
+    setRandomImage();
+    saveProgress();
         }
 
         function checkAchievements(revealTime, fileName) {
